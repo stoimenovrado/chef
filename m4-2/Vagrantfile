@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+    
+  config.ssh.insert_key = false
+
+  config.vm.define "web" do |web|
+    web.vm.box = "shekeriev/debian-11"
+    web.vm.hostname = "web.hw4.lab"
+    web.vm.network "private_network", ip: "192.168.89.141"
+    web.vm.provision "shell", path: "ntp-debian.sh"
+    web.vm.provision "shell", path: "debian-workst.sh"
+    web.vm.provision "shell", path: "add_hosts.sh"
+    web.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
+    end
+  end
+  
+  config.vm.define "db" do |db|
+    db.vm.box = "shekeriev/centos-stream-9"
+    db.vm.hostname = "db.hw4.lab"
+    db.vm.network "private_network", ip: "192.168.89.142"
+    db.vm.provision "shell", path: "add_hosts.sh"
+    db.vm.provision "shell", path: "ntp-centos.sh"
+    db.vm.provision "shell", path: "centos-workst.sh"
+    db.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
+    end
+  end
+end
